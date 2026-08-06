@@ -1,0 +1,32 @@
+services:
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./backend/.env
+
+  postgres:
+    image: postgres:16
+    container_name: spendwise-postgres
+    environment:
+      POSTGRES_USER: spendwise
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: spendwise_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
+
+
+volumes:
+  postgres_data:
