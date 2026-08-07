@@ -8,10 +8,11 @@ const app = express();
 const PORT = 4000;
 
 const allowedOrigins= [
-  "http://localhost:3000",
+  "http://localhost:3000", 
   "http://127.0.0.1:3000",
   "http://localhost:3001",
   "http://127.0.0.1:3001",
+  "http://localhost:8081",
 ]
 
 
@@ -23,6 +24,7 @@ app.use(
   })
 );
 
+// app.use(cors());
 
 // Parse JSON body
 app.use(express.json());
@@ -52,7 +54,7 @@ app.use("/expenses", expenseRoutes);
 
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT,"0.0.0.0", () => {
   console.log("Database connected");
   console.log(`Server running on port ${PORT}`);
 });
