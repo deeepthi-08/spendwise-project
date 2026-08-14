@@ -40,8 +40,7 @@ export default function HomeScreen() {
   const [categoryId, setCategoryId] = useState("1");
   const [expenseDate, setExpenseDate] = useState("");
 
-  const [editingExpense, setEditingExpense] =
-    useState<Expense | null>(null);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
@@ -108,9 +107,7 @@ export default function HomeScreen() {
       console.error("Fetch expenses error:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to load expenses",
+        error instanceof Error ? error.message : "Failed to load expenses",
       );
     } finally {
       setLoading(false);
@@ -135,17 +132,11 @@ export default function HomeScreen() {
   const numberOfExpenses = expenses.length;
 
   const averageExpense =
-    numberOfExpenses > 0
-      ? totalExpenses / numberOfExpenses
-      : 0;
+    numberOfExpenses > 0 ? totalExpenses / numberOfExpenses : 0;
 
   const largestExpense =
     expenses.length > 0
-      ? Math.max(
-          ...expenses.map((expense) =>
-            Number(expense.amount),
-          ),
-        )
+      ? Math.max(...expenses.map((expense) => Number(expense.amount)))
       : 0;
 
   const currentMonth = new Date().getMonth();
@@ -235,8 +226,7 @@ export default function HomeScreen() {
       setError("");
 
       const token = await getToken();
-      const userId =
-        await SecureStore.getItemAsync("user_id");
+      const userId = await SecureStore.getItemAsync("user_id");
 
       if (!token || !userId) {
         router.replace("/login");
@@ -254,8 +244,7 @@ export default function HomeScreen() {
           category_id: Number(categoryId),
           amount: amountNumber,
           description: description.trim(),
-          expense_date:
-            convertToDatabaseDate(expenseDate),
+          expense_date: convertToDatabaseDate(expenseDate),
         }),
       });
 
@@ -270,19 +259,14 @@ export default function HomeScreen() {
 
       const newExpense = await response.json();
 
-      setExpenses((previous) => [
-        ...previous,
-        newExpense,
-      ]);
+      setExpenses((previous) => [...previous, newExpense]);
 
       clearForm();
     } catch (error) {
       console.error("Add expense error:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to add expense",
+        error instanceof Error ? error.message : "Failed to add expense",
       );
     }
   }
@@ -297,9 +281,7 @@ export default function HomeScreen() {
     setDescription(expense.description);
     setAmount(String(expense.amount));
     setCategoryId(String(expense.category_id));
-    setExpenseDate(
-      formatDate(expense.expense_date),
-    );
+    setExpenseDate(formatDate(expense.expense_date));
 
     setError("");
   }
@@ -352,22 +334,18 @@ export default function HomeScreen() {
         return;
       }
 
-      const response = await fetch(
-        `${API_URL}/expenses/${editingExpense.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            amount: amountNumber,
-            description: description.trim(),
-            expense_date:
-              convertToDatabaseDate(expenseDate),
-          }),
+      const response = await fetch(`${API_URL}/expenses/${editingExpense.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({
+          amount: amountNumber,
+          description: description.trim(),
+          expense_date: convertToDatabaseDate(expenseDate),
+        }),
+      });
 
       if (response.status === 401) {
         await logout();
@@ -382,9 +360,7 @@ export default function HomeScreen() {
 
       setExpenses((previous) =>
         previous.map((expense) =>
-          expense.id === updatedExpense.id
-            ? updatedExpense
-            : expense,
+          expense.id === updatedExpense.id ? updatedExpense : expense,
         ),
       );
 
@@ -393,9 +369,7 @@ export default function HomeScreen() {
       console.error("Update expense error:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to update expense",
+        error instanceof Error ? error.message : "Failed to update expense",
       );
     }
   }
@@ -415,15 +389,12 @@ export default function HomeScreen() {
         return;
       }
 
-      const response = await fetch(
-        `${API_URL}/expenses/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`${API_URL}/expenses/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       if (response.status === 401) {
         await logout();
@@ -435,17 +406,13 @@ export default function HomeScreen() {
       }
 
       setExpenses((previous) =>
-        previous.filter(
-          (expense) => expense.id !== id,
-        ),
+        previous.filter((expense) => expense.id !== id),
       );
     } catch (error) {
       console.error("Delete expense error:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to delete expense",
+        error instanceof Error ? error.message : "Failed to delete expense",
       );
     }
   }
@@ -471,33 +438,20 @@ export default function HomeScreen() {
     const search = searchTerm.toLowerCase().trim();
 
     return expenses.filter((expense) => {
-      const categoryName =
-        categories[expense.category_id] ||
-        "Unknown";
+      const categoryName = categories[expense.category_id] || "Unknown";
 
       const matchesSearch =
-        expense.description
-          .toLowerCase()
-          .includes(search) ||
-        categoryName
-          .toLowerCase()
-          .includes(search) ||
-        expense.amount
-          .toString()
-          .includes(search);
+        expense.description.toLowerCase().includes(search) ||
+        categoryName.toLowerCase().includes(search) ||
+        expense.amount.toString().includes(search);
 
       const matchesCategory =
         filterCategory === "all" ||
-        expense.category_id ===
-          Number(filterCategory);
+        expense.category_id === Number(filterCategory);
 
       return matchesSearch && matchesCategory;
     });
-  }, [
-    expenses,
-    searchTerm,
-    filterCategory,
-  ]);
+  }, [expenses, searchTerm, filterCategory]);
 
   // --------------------------------------------------
   // UI
@@ -513,9 +467,7 @@ export default function HomeScreen() {
 
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>
-            💰 SpendWise
-          </Text>
+          <Text style={styles.title}>💰 SpendWise</Text>
 
           <Text style={styles.headerSubtitle}>
             Track your expenses effortlessly
@@ -525,26 +477,20 @@ export default function HomeScreen() {
         <Pressable
           style={styles.logoutButton}
           onPress={() => {
-            Alert.alert(
-              "Logout",
-              "Are you sure you want to logout?",
-              [
-                {
-                  text: "Cancel",
-                  style: "cancel",
-                },
-                {
-                  text: "Logout",
-                  style: "destructive",
-                  onPress: logout,
-                },
-              ],
-            );
+            Alert.alert("Logout", "Are you sure you want to logout?", [
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+              {
+                text: "Logout",
+                style: "destructive",
+                onPress: logout,
+              },
+            ]);
           }}
         >
-          <Text style={styles.logoutText}>
-            Logout
-          </Text>
+          <Text style={styles.logoutText}>Logout</Text>
         </Pressable>
       </View>
 
@@ -552,17 +498,13 @@ export default function HomeScreen() {
 
       {error ? (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText}>
-            ⚠️ {error}
-          </Text>
+          <Text style={styles.errorText}>⚠️ {error}</Text>
         </View>
       ) : null}
 
       {/* SUMMARY */}
 
-      <Text style={styles.sectionTitle}>
-        Overview
-      </Text>
+      <Text style={styles.sectionTitle}>Overview</Text>
 
       <ScrollView
         horizontal
@@ -570,49 +512,31 @@ export default function HomeScreen() {
         style={styles.summaryScroll}
       >
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>
-            Total Expenses
-          </Text>
+          <Text style={styles.summaryLabel}>Total Expenses</Text>
 
-          <Text style={styles.summaryValue}>
-            ₹{totalExpenses.toFixed(2)}
-          </Text>
+          <Text style={styles.summaryValue}>₹{totalExpenses.toFixed(2)}</Text>
         </View>
 
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>
-            Transactions
-          </Text>
+          <Text style={styles.summaryLabel}>Transactions</Text>
 
-          <Text style={styles.summaryValue}>
-            {numberOfExpenses}
-          </Text>
+          <Text style={styles.summaryValue}>{numberOfExpenses}</Text>
         </View>
 
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>
-            Average Expense
-          </Text>
+          <Text style={styles.summaryLabel}>Average Expense</Text>
 
-          <Text style={styles.summaryValue}>
-            ₹{averageExpense.toFixed(2)}
-          </Text>
+          <Text style={styles.summaryValue}>₹{averageExpense.toFixed(2)}</Text>
         </View>
 
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>
-            Largest Expense
-          </Text>
+          <Text style={styles.summaryLabel}>Largest Expense</Text>
 
-          <Text style={styles.summaryValue}>
-            ₹{largestExpense.toFixed(2)}
-          </Text>
+          <Text style={styles.summaryValue}>₹{largestExpense.toFixed(2)}</Text>
         </View>
 
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>
-            This Month
-          </Text>
+          <Text style={styles.summaryLabel}>This Month</Text>
 
           <Text style={styles.summaryValue}>
             ₹{currentMonthExpenses.toFixed(2)}
@@ -624,14 +548,13 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>
-          {editingExpense
-            ? "Edit Expense"
-            : "Add Expense"}
+          {editingExpense ? "Edit Expense" : "Add Expense"}
         </Text>
 
         <TextInput
           style={styles.input}
           placeholder="Description"
+          placeholderTextColor="#6b7280"
           value={description}
           onChangeText={setDescription}
         />
@@ -639,29 +562,26 @@ export default function HomeScreen() {
         <TextInput
           style={styles.input}
           placeholder="Amount"
+          placeholderTextColor="#6b7280"
           keyboardType="numeric"
           value={amount}
           onChangeText={setAmount}
         />
 
-        <Text style={styles.label}>
-          Category
-        </Text>
+        <Text style={styles.label}>Category</Text>
 
         <View style={styles.categoryRow}>
           <Pressable
             style={[
               styles.categoryButton,
-              categoryId === "1" &&
-                styles.selectedCategory,
+              categoryId === "1" && styles.selectedCategory,
             ]}
             onPress={() => setCategoryId("1")}
           >
             <Text
               style={[
                 styles.categoryText,
-                categoryId === "1" &&
-                  styles.selectedCategoryText,
+                categoryId === "1" && styles.selectedCategoryText,
               ]}
             >
               Food
@@ -671,16 +591,14 @@ export default function HomeScreen() {
           <Pressable
             style={[
               styles.categoryButton,
-              categoryId === "2" &&
-                styles.selectedCategory,
+              categoryId === "2" && styles.selectedCategory,
             ]}
             onPress={() => setCategoryId("2")}
           >
             <Text
               style={[
                 styles.categoryText,
-                categoryId === "2" &&
-                  styles.selectedCategoryText,
+                categoryId === "2" && styles.selectedCategoryText,
               ]}
             >
               Transport
@@ -690,16 +608,14 @@ export default function HomeScreen() {
           <Pressable
             style={[
               styles.categoryButton,
-              categoryId === "3" &&
-                styles.selectedCategory,
+              categoryId === "3" && styles.selectedCategory,
             ]}
             onPress={() => setCategoryId("3")}
           >
             <Text
               style={[
                 styles.categoryText,
-                categoryId === "3" &&
-                  styles.selectedCategoryText,
+                categoryId === "3" && styles.selectedCategoryText,
               ]}
             >
               Shopping
@@ -710,33 +626,23 @@ export default function HomeScreen() {
         <TextInput
           style={styles.input}
           placeholder="Date: DD-MM-YYYY"
+          placeholderTextColor="#6b7280"
           value={expenseDate}
           onChangeText={setExpenseDate}
         />
 
         <Pressable
           style={styles.primaryButton}
-          onPress={
-            editingExpense
-              ? updateExpense
-              : addExpense
-          }
+          onPress={editingExpense ? updateExpense : addExpense}
         >
           <Text style={styles.primaryButtonText}>
-            {editingExpense
-              ? "Update Expense"
-              : "Add Expense"}
+            {editingExpense ? "Update Expense" : "Add Expense"}
           </Text>
         </Pressable>
 
         {editingExpense ? (
-          <Pressable
-            style={styles.cancelButton}
-            onPress={clearForm}
-          >
-            <Text style={styles.cancelText}>
-              Cancel
-            </Text>
+          <Pressable style={styles.cancelButton} onPress={clearForm}>
+            <Text style={styles.cancelText}>Cancel</Text>
           </Pressable>
         ) : null}
       </View>
@@ -744,37 +650,30 @@ export default function HomeScreen() {
       {/* SEARCH */}
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>
-          Search & Filter
-        </Text>
+        <Text style={styles.sectionTitle}>Search & Filter</Text>
 
         <TextInput
           style={styles.input}
           placeholder="Search description, category or amount..."
+          placeholderTextColor="#6b7280"
           value={searchTerm}
           onChangeText={setSearchTerm}
         />
 
-        <Text style={styles.label}>
-          Filter by Category
-        </Text>
+        <Text style={styles.label}>Filter by Category</Text>
 
         <View style={styles.filterRow}>
           <Pressable
             style={[
               styles.filterButton,
-              filterCategory === "all" &&
-                styles.selectedFilter,
+              filterCategory === "all" && styles.selectedFilter,
             ]}
-            onPress={() =>
-              setFilterCategory("all")
-            }
+            onPress={() => setFilterCategory("all")}
           >
             <Text
               style={[
                 styles.filterText,
-                filterCategory === "all" &&
-                  styles.selectedFilterText,
+                filterCategory === "all" && styles.selectedFilterText,
               ]}
             >
               All
@@ -784,18 +683,14 @@ export default function HomeScreen() {
           <Pressable
             style={[
               styles.filterButton,
-              filterCategory === "1" &&
-                styles.selectedFilter,
+              filterCategory === "1" && styles.selectedFilter,
             ]}
-            onPress={() =>
-              setFilterCategory("1")
-            }
+            onPress={() => setFilterCategory("1")}
           >
             <Text
               style={[
                 styles.filterText,
-                filterCategory === "1" &&
-                  styles.selectedFilterText,
+                filterCategory === "1" && styles.selectedFilterText,
               ]}
             >
               Food
@@ -805,18 +700,14 @@ export default function HomeScreen() {
           <Pressable
             style={[
               styles.filterButton,
-              filterCategory === "2" &&
-                styles.selectedFilter,
+              filterCategory === "2" && styles.selectedFilter,
             ]}
-            onPress={() =>
-              setFilterCategory("2")
-            }
+            onPress={() => setFilterCategory("2")}
           >
             <Text
               style={[
                 styles.filterText,
-                filterCategory === "2" &&
-                  styles.selectedFilterText,
+                filterCategory === "2" && styles.selectedFilterText,
               ]}
             >
               Transport
@@ -826,18 +717,14 @@ export default function HomeScreen() {
           <Pressable
             style={[
               styles.filterButton,
-              filterCategory === "3" &&
-                styles.selectedFilter,
+              filterCategory === "3" && styles.selectedFilter,
             ]}
-            onPress={() =>
-              setFilterCategory("3")
-            }
+            onPress={() => setFilterCategory("3")}
           >
             <Text
               style={[
                 styles.filterText,
-                filterCategory === "3" &&
-                  styles.selectedFilterText,
+                filterCategory === "3" && styles.selectedFilterText,
               ]}
             >
               Shopping
@@ -850,70 +737,45 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <View style={styles.listHeader}>
-          <Text style={styles.sectionTitle}>
-            Recent Expenses
-          </Text>
+          <Text style={styles.sectionTitle}>Recent Expenses</Text>
 
           <Text style={styles.showingText}>
-            {filteredExpenses.length} /{" "}
-            {expenses.length}
+            {filteredExpenses.length} / {expenses.length}
           </Text>
         </View>
 
         {loading ? (
-          <Text style={styles.emptyText}>
-            Loading expenses...
-          </Text>
+          <Text style={styles.emptyText}>Loading expenses...</Text>
         ) : filteredExpenses.length === 0 ? (
-          <Text style={styles.emptyText}>
-            No expenses found.
-          </Text>
+          <Text style={styles.emptyText}>No expenses found.</Text>
         ) : (
           filteredExpenses.map((expense) => (
-            <View
-              key={expense.id}
-              style={styles.expenseCard}
-            >
+            <View key={expense.id} style={styles.expenseCard}>
               <View style={styles.expenseInfo}>
-                <Text
-                  style={styles.expenseDescription}
-                >
+                <Text style={styles.expenseDescription}>
                   {expense.description}
                 </Text>
 
                 <Text style={styles.expenseCategory}>
-                  {categories[
-                    expense.category_id
-                  ] || "Unknown Category"}
+                  {categories[expense.category_id] || "Unknown Category"}
                 </Text>
 
                 <Text style={styles.expenseDate}>
-                  {formatDate(
-                    expense.expense_date,
-                  )}
+                  {formatDate(expense.expense_date)}
                 </Text>
               </View>
 
               <View style={styles.expenseRight}>
                 <Text style={styles.expenseAmount}>
-                  ₹
-                  {Number(
-                    expense.amount,
-                  ).toFixed(2)}
+                  ₹{Number(expense.amount).toFixed(2)}
                 </Text>
 
                 <View style={styles.actionRow}>
                   <Pressable
                     style={styles.editButton}
-                    onPress={() =>
-                      startEdit(expense)
-                    }
+                    onPress={() => startEdit(expense)}
                   >
-                    <Text
-                      style={styles.actionText}
-                    >
-                      Edit
-                    </Text>
+                    <Text style={styles.actionText}>Edit</Text>
                   </Pressable>
 
                   <Pressable
@@ -930,20 +792,13 @@ export default function HomeScreen() {
                           {
                             text: "Delete",
                             style: "destructive",
-                            onPress: () =>
-                              deleteExpense(
-                                expense.id,
-                              ),
+                            onPress: () => deleteExpense(expense.id),
                           },
                         ],
                       );
                     }}
                   >
-                    <Text
-                      style={styles.actionText}
-                    >
-                      Delete
-                    </Text>
+                    <Text style={styles.actionText}>Delete</Text>
                   </Pressable>
                 </View>
               </View>
@@ -979,7 +834,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: "bold",
-    color: "white",
+    color: "#ffffff",
   },
 
   headerSubtitle: {
@@ -989,7 +844,7 @@ const styles = StyleSheet.create({
   },
 
   logoutButton: {
-    backgroundColor: "white",
+    backgroundColor: "#ffffff",
     paddingVertical: 9,
     paddingHorizontal: 14,
     borderRadius: 9,
@@ -1025,7 +880,7 @@ const styles = StyleSheet.create({
 
   summaryCard: {
     width: 155,
-    backgroundColor: "white",
+    backgroundColor: "#ffffff",
     borderRadius: 14,
     padding: 16,
     marginRight: 12,
@@ -1036,7 +891,7 @@ const styles = StyleSheet.create({
 
   summaryLabel: {
     fontSize: 13,
-    color: "#6b7280",
+    color: "#374151",
   },
 
   summaryValue: {
@@ -1047,7 +902,7 @@ const styles = StyleSheet.create({
   },
 
   section: {
-    backgroundColor: "white",
+    backgroundColor: "#ffffff",
     borderRadius: 16,
     padding: 16,
     marginBottom: 18,
@@ -1064,6 +919,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: "#ffffff",
     fontSize: 15,
+    color: "#111827",
   },
 
   label: {
@@ -1086,6 +942,7 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     marginRight: 6,
     alignItems: "center",
+    backgroundColor: "#ffffff",
   },
 
   selectedCategory: {
@@ -1099,7 +956,7 @@ const styles = StyleSheet.create({
   },
 
   selectedCategoryText: {
-    color: "white",
+    color: "#ffffff",
   },
 
   primaryButton: {
@@ -1110,7 +967,7 @@ const styles = StyleSheet.create({
   },
 
   primaryButtonText: {
-    color: "white",
+    color: "#ffffff",
     fontWeight: "bold",
     fontSize: 15,
   },
@@ -1122,6 +979,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 13,
     alignItems: "center",
+    backgroundColor: "#ffffff",
   },
 
   cancelText: {
@@ -1153,7 +1011,7 @@ const styles = StyleSheet.create({
   },
 
   selectedFilterText: {
-    color: "white",
+    color: "#ffffff",
   },
 
   listHeader: {
@@ -1168,7 +1026,7 @@ const styles = StyleSheet.create({
   },
 
   emptyText: {
-    color: "#6b7280",
+    color: "#374151",
     paddingVertical: 20,
     textAlign: "center",
   },
@@ -1237,7 +1095,7 @@ const styles = StyleSheet.create({
   },
 
   actionText: {
-    color: "white",
+    color: "#ffffff",
     fontWeight: "bold",
     fontSize: 13,
   },

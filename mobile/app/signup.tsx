@@ -21,10 +21,7 @@ export default function SignupScreen() {
 
   async function handleSignup() {
     if (!name.trim() || !email.trim() || !password.trim()) {
-      Alert.alert(
-        "Error",
-        "Name, email and password are required"
-      );
+      Alert.alert("Error", "Name, email and password are required");
       return;
     }
 
@@ -60,16 +57,14 @@ export default function SignupScreen() {
             text: "OK",
             onPress: () => router.replace("/login"),
           },
-        ]
+        ],
       );
     } catch (error) {
       console.error("SIGNUP ERROR:", error);
 
       Alert.alert(
         "Signup Failed",
-        error instanceof Error
-          ? error.message
-          : "Something went wrong"
+        error instanceof Error ? error.message : "Something went wrong",
       );
     } finally {
       setLoading(false);
@@ -80,9 +75,7 @@ export default function SignupScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>💰 SpendWise</Text>
 
-      <Text style={styles.subtitle}>
-        Create your account
-      </Text>
+      <Text style={styles.subtitle}>Create your account</Text>
 
       <Text style={styles.label}>Name</Text>
 
@@ -119,10 +112,7 @@ export default function SignupScreen() {
       />
 
       <TouchableOpacity
-        style={[
-          styles.button,
-          loading && styles.buttonDisabled,
-        ]}
+        style={[styles.button, loading && styles.buttonDisabled]}
         onPress={handleSignup}
         disabled={loading}
       >
@@ -135,9 +125,7 @@ export default function SignupScreen() {
         style={styles.loginButton}
         onPress={() => router.replace("/login")}
       >
-        <Text style={styles.loginText}>
-          Already have an account? Login
-        </Text>
+        <Text style={styles.loginText}>Already have an account? Login</Text>
       </TouchableOpacity>
     </View>
   );

@@ -50,10 +50,8 @@ export default function LoginScreen() {
       }
 
       await SecureStore.setItemAsync("jwt_token", data.token);
-      await SecureStore.setItemAsync(
-        "user_id",
-        String(data.user.id)
-      );
+
+      await SecureStore.setItemAsync("user_id", String(data.user.id));
 
       router.replace("/(tabs)");
     } catch (error) {
@@ -61,9 +59,7 @@ export default function LoginScreen() {
 
       Alert.alert(
         "Login Failed",
-        error instanceof Error
-          ? error.message
-          : "Something went wrong"
+        error instanceof Error ? error.message : "Something went wrong",
       );
     } finally {
       setLoading(false);
@@ -74,9 +70,7 @@ export default function LoginScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>SpendWise</Text>
 
-      <Text style={styles.subtitle}>
-        Login to your account
-      </Text>
+      <Text style={styles.subtitle}>Login to your account</Text>
 
       <Text style={styles.label}>Email</Text>
 
@@ -103,10 +97,7 @@ export default function LoginScreen() {
       />
 
       <TouchableOpacity
-        style={[
-          styles.button,
-          loading && styles.buttonDisabled,
-        ]}
+        style={[styles.button, loading && styles.buttonDisabled]}
         onPress={handleLogin}
         disabled={loading}
       >
@@ -116,16 +107,10 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <View style={styles.signupContainer}>
-        <Text style={styles.signupText}>
-          Don't have an account?
-        </Text>
+        <Text style={styles.signupText}>Don&apos;t have an account?</Text>
 
-        <TouchableOpacity
-          onPress={() => router.push("/signup" as any)}
-        >
-          <Text style={styles.signupLink}>
-            Sign Up
-          </Text>
+        <TouchableOpacity onPress={() => router.push("/signup" as any)}>
+          <Text style={styles.signupLink}>Sign Up</Text>
         </TouchableOpacity>
       </View>
     </View>
