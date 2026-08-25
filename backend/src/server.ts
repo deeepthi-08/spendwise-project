@@ -18,7 +18,6 @@ const allowedOrigins = [
   "http://localhost:8081",
 ];
 
-// Allow requests from frontend/mobile
 app.use(
   cors({
     origin: allowedOrigins,
@@ -26,7 +25,6 @@ app.use(
   })
 );
 
-// Parse JSON body
 app.use(express.json());
 
 // Health check
@@ -34,11 +32,13 @@ app.get("/health", async (req, res) => {
   try {
     await pool.query("SELECT 1");
 
-    res.json({
+    res.status(200).json({
       status: "ok",
       database: "connected",
     });
   } catch (error) {
+    console.error("Health check database error:", error);
+
     res.status(500).json({
       status: "error",
       database: "disconnected",
@@ -52,13 +52,14 @@ app.use("/auth", authRoutes);
 // Expense routes
 app.use("/expenses", expenseRoutes);
 
-// categories routes
+// Categories routes
 app.use("/categories", categoryRoutes);
 
-// Start server
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("Database connected");
-  console.log(`Server running on port ${PORT}`);
-});
+// Start server only when this file is run directly
+if (require.main === module) {
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 export default app;
