@@ -50,6 +50,11 @@ jobs:
       - name: Start services
         run: docker compose up -d --build
 
+      # Show backend logs
+      - name: Backend logs
+        if: always()
+        run: docker compose logs backend
+
       # Test backend inside Docker
       - name: Test backend
         run: docker compose exec -T backend npm test
