@@ -36,6 +36,16 @@ jobs:
         run: npm run build
         working-directory: ./backend
 
+      # Create CI environment
+      - name: Create backend environment
+        run: |
+          echo "DB_USER=spendwise" >> backend/.env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> backend/.env
+          echo "DB_HOST=postgres" >> backend/.env
+          echo "DB_PORT=5432" >> backend/.env
+          echo "DB_NAME=spendwise_db" >> backend/.env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> backend/.env
+
       # Start Docker services
       - name: Start services
         run: docker compose up -d --build
