@@ -1,0 +1,50 @@
+# Workflow name
+name: SpendWise CI
+
+# When to run
+on:
+  push:
+  pull_request:
+
+# CI jobs
+jobs:
+  ci:
+
+    # Ubuntu runner
+    runs-on: ubuntu-latest
+
+    # CI steps
+    steps:
+
+      # Get code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Install dependencies
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: ./backend
+
+      # Build backend
+      - name: Build backend
+        run: npm run build
+        working-directory: ./backend
+
+      # Start Docker services
+      - name: Start services
+        run: docker compose up -d --build
+
+      # Test backend inside Docker
+      - name: Test backend
+        run: docker compose exec -T backend npm test
+
+      # Lint backend
+      - name: Lint backend
+        run: npm run lint
+        working-directory: ./backend
