@@ -180,3 +180,7 @@ PostgreSQL
 Docker Compose allows the entire stack to be started with a single command.
 
 The backend and frontend images are versioned and published to Docker Hub as version `1.0`.
+
+## CI
+
+SpendWise uses GitHub Actions to automatically run backend, frontend, and mobile tests and lint checks on pushes and pull requests.
