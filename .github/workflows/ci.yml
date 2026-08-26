@@ -1,65 +1,110 @@
-# Workflow name
 name: SpendWise CI
 
-# When to run
 on:
   push:
-  pull_request:
+    branches:
+      - "**"
 
-# CI jobs
+  pull_request:
+    branches:
+      - "**"
+
 jobs:
   ci:
-
-    # Ubuntu runner
+    name: Build, Test and Lint
     runs-on: ubuntu-latest
 
-    # CI steps
+    services:
+      postgres:
+        image: postgres:16
+
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: spendwise_test
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd "pg_isready -U testuser -d spendwise_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
 
-      # Get code
+      # 1. Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Setup Node
+      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
-      # Install dependencies
+      # 3. Install backend dependencies
       - name: Install backend dependencies
+        working-directory: backend
         run: npm ci
-        working-directory: ./backend
 
-      # Build backend
-      - name: Build backend
-        run: npm run build
-        working-directory: ./backend
+      # 4. Install frontend dependencies
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
 
-      # Create CI environment
-      - name: Create backend environment
+      # 5. Build backend Docker image
+      - name: Build backend Docker image
+        run: docker build -t spendwise-backend:ci ./backend
+
+      # 6. Build frontend Docker image
+      - name: Build frontend Docker image
+        run: docker build -t spendwise-frontend:ci ./frontend
+
+      # 7. Initialize test database
+      - name: Initialize test database
+        env:
+          PGPASSWORD: testpassword
         run: |
-          echo "DB_USER=spendwise" >> backend/.env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> backend/.env
-          echo "DB_HOST=postgres" >> backend/.env
-          echo "DB_PORT=5432" >> backend/.env
-          echo "DB_NAME=spendwise_db" >> backend/.env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> backend/.env
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          psql -h localhost -U testuser -d spendwise_test -f database/schema.sql
 
-      # Start Docker services
-      - name: Start services
-        run: docker compose up -d --build
+      # 8. Run backend tests
+      - name: Run backend tests
+        working-directory: backend
+        env:
+          DB_USER: testuser
+          DB_PASSWORD: testpassword
+          DB_NAME: spendwise_test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          JWT_SECRET: test-secret
+        run: npm test -- --runInBand
 
-      # Show backend logs
-      - name: Backend logs
-        if: always()
-        run: docker compose logs backend
-
-      # Test backend inside Docker
-      - name: Test backend
-        run: docker compose exec -T backend npm test
-
-      # Lint backend
-      - name: Lint backend
+      # 9. Run backend lint
+      - name: Run backend lint
+        working-directory: backend
         run: npm run lint
-        working-directory: ./backend
+
+      # 10. Run frontend tests
+      - name: Run frontend tests
+        working-directory: frontend
+        run: npm test -- --runInBand
+
+      # 11. Run frontend lint
+      - name: Run frontend lint
+        working-directory: frontend
+        run: npm run lint
+
+      # 12. Build backend TypeScript
+      - name: Build backend
+        working-directory: backend
+        run: npm run build
+
+      # 13. Build frontend
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
