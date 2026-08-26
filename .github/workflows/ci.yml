@@ -54,15 +54,20 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      # 5. Build backend Docker image
+      # 5. Install mobile dependencies
+      - name: Install mobile dependencies
+        working-directory: mobile
+        run: npm ci
+
+      # 6. Build backend Docker image
       - name: Build backend Docker image
         run: docker build -t spendwise-backend:ci ./backend
 
-      # 6. Build frontend Docker image
+      # 7. Build frontend Docker image
       - name: Build frontend Docker image
         run: docker build -t spendwise-frontend:ci ./frontend
 
-      # 7. Initialize test database
+      # 8. Initialize test database
       - name: Initialize test database
         env:
           PGPASSWORD: testpassword
@@ -80,7 +85,7 @@ jobs:
               ('Shopping');
           "
 
-      # 8. Run backend tests
+      # 9. Run backend tests
       - name: Run backend tests
         working-directory: backend
         env:
@@ -92,27 +97,37 @@ jobs:
           JWT_SECRET: test-secret
         run: npm test -- --runInBand
 
-      # 9. Run backend lint
+      # 10. Run backend lint
       - name: Run backend lint
         working-directory: backend
         run: npm run lint
 
-      # 10. Run frontend tests
+      # 11. Run frontend tests
       - name: Run frontend tests
         working-directory: frontend
         run: npm test -- --runInBand
 
-      # 11. Run frontend lint
+      # 12. Run frontend lint
       - name: Run frontend lint
         working-directory: frontend
         run: npm run lint
 
-      # 12. Build backend TypeScript
+      # 13. Run mobile tests
+      - name: Run mobile tests
+        working-directory: mobile
+        run: npm test -- --runInBand
+
+      # 14. Run mobile lint
+      - name: Run mobile lint
+        working-directory: mobile
+        run: npm run lint
+
+      # 15. Build backend TypeScript
       - name: Build backend
         working-directory: backend
         run: npm run build
 
-      # 13. Build frontend
+      # 16. Build frontend
       - name: Build frontend
         working-directory: frontend
         run: npm run build
