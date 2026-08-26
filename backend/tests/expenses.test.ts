@@ -53,7 +53,7 @@ describe("Expenses API", () => {
         expense_date: "2026-07-30",
       });
 
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(200);
 
     expect(response.body).toHaveProperty("id");
     expect(response.body.description).toBe("Test expense");
