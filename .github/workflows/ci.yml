@@ -69,7 +69,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
+
           psql -h localhost -U testuser -d spendwise_test -f database/schema.sql
+
+          psql -h localhost -U testuser -d spendwise_test -c "
+            INSERT INTO categories (name)
+            VALUES
+              ('Food'),
+              ('Transport'),
+              ('Shopping');
+          "
 
       # 8. Run backend tests
       - name: Run backend tests
